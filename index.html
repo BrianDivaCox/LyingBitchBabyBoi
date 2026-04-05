@@ -82,63 +82,75 @@
         </div>
     </div>
 
-    <script type="module">
-        // Import Firebase functions (UPDATED: now imports 'update' and 'increment')
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getDatabase, ref, push, onDisconnect, onValue, update, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+   <script type="module">
+    // Import essential Firebase functions
+    // We remove 'update' and 'increment' and add 'runTransaction'.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, push, onDisconnect, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 
-        // Your Firebase configuration (DO NOT SHARE THESE DETAILS PUBLICLY)
-        // Ensure you use your REAL, FULL apiKey here.
-        const firebaseConfig = {
-            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI", /* Use your actual apiKey here */
-            authDomain: "lbbb-webcounter.firebaseapp.com",
-            projectId: "lbbb-webcounter",
-            storageBucket: "lbbb-webcounter.firebasestorage.app",
-            messagingSenderId: "217634980859",
-            appId: "1:217634980859:web:49ef2b0aa7fe7d0bb1415e",
-            measurementId: "G-K6L33E59SJ",
-            // This is the property that must match your Firebase Console EXACTLY:
-            databaseURL: "https://lbbb-webcounter-default-rtdb.firebaseio.com/"
-        };
+    // Your Firebase configuration (Ensure this is EXACTLY correct)
+    const firebaseConfig = {
+        apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI", /* Use your actual apiKey here */
+        authDomain: "lbbb-webcounter.firebaseapp.com",
+        projectId: "lbbb-webcounter",
+        storageBucket: "lbbb-webcounter.firebasestorage.app",
+        messagingSenderId: "217634980859",
+        appId: "1:217634980859:web:49ef2b0aa7fe7d0bb1415e",
+        measurementId: "G-K6L33E59SJ",
+        // This is the property that must match your Firebase Console EXACTLY:
+        databaseURL: "https://lbbb-webcounter-default-rtdb.firebaseio.com/"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getDatabase(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
 
-        // --- SECTION 1: TOTAL VIEWS COUNTER (Cumulative) ---
-        const totalViewsRef = ref(db, "totalViewCount");
+    // --- SECTION 1: TOTAL VIEWS COUNTER (Cumulative) ---
+    const totalViewsRef = ref(db, "totalViewCount");
 
-        // 1. Increment Total Views securely on page load
-        update(totalViewsRef, increment(1));
+    // 1. Increment Total Views securely using a TRANSACTION.
+    // This method is robust against potential increment() issues.
+    // It checks the CURRENT value and only adds 1 to it.
+    runTransaction(totalViewsRef, (currentValue) => {
+        // If 'currentValue' doesn't exist yet, start at 1.
+        if (currentValue === null || typeof currentValue === 'undefined') {
+            return 1;
+        }
+        
+        // Otherwise, add 1 to the existing value.
+        // We add checks to ensure we are adding 1 to a number.
+        const currentCount = Number(currentValue) || 0;
+        return currentCount + 1;
+    });
 
-        // 2. Display the current Total Views and listen for live updates
-        onValue(totalViewsRef, (snapshot) => {
-            const count = snapshot.val() || 0; // Use .val() to get the number
-            document.getElementById("totalViewsCounter").textContent = count;
-        });
+    // 2. Display the current Total Views and listen for live updates
+    onValue(totalViewsRef, (snapshot) => {
+        const count = snapshot.val() || 0; // Use .val() to get the number
+        document.getElementById("totalViewsCounter").textContent = count;
+    });
 
-        // --- SECTION 2: LIVE VISITOR COUNTER (Connections) ---
-        const visitorsConnectedRef = ref(db, "visitorsConnected");
-        const connectedRef = ref(db, ".info/connected");
+    // --- SECTION 2: LIVE VISITOR COUNTER (Connections) ---
+    const visitorsConnectedRef = ref(db, "visitorsConnected");
+    const connectedRef = ref(db, ".info/connected");
 
-        // Monitor connection status
-        onValue(connectedRef, (snapshot) => {
-            if (snapshot.val() === true) {
-                // We're connected, add this visitor
-                const visitorRef = push(visitorsConnectedRef, true);
+    // Monitor connection status
+    onValue(connectedRef, (snapshot) => {
+        if (snapshot.val() === true) {
+            // We're connected, add this visitor
+            const visitorRef = push(visitorsConnectedRef, true);
 
-                // Remove this visitor when they disconnect
-                onDisconnect(visitorRef).remove();
-            }
-        });
+            // Remove this visitor when they disconnect
+            onDisconnect(visitorRef).remove();
+        }
+    });
 
-        // Listen for live updates to visitor count
-        onValue(visitorsConnectedRef, (snapshot) => {
-            const count = snapshot.size || 0; // Use .size for number of children
-            document.getElementById("visitorCounter").textContent = count;
-        });
-    </script>
+    // Listen for live updates to visitor count
+    onValue(visitorsConnectedRef, (snapshot) => {
+        const count = snapshot.size || 0; // Use .size for number of children
+        document.getElementById("visitorCounter").textContent = count;
+    });
+</script>
 </body>
 </html>
