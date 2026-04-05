@@ -116,6 +116,27 @@
     <div class="counter-container">
         <p>✨ TALES DETECTED (Total):</p>
         <div id="totalViewsCounter">0</div>
+            // ...other imports...
+// Make sure you import 'update' and 'increment'
+import { getDatabase, ref, push, onDisconnect, onValue, update, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+// ...Firebase config and initialization...
+
+// New references
+const totalViewsRef = ref(db, "totalViewCount");
+
+// 1. Increment Total Views on page load
+// This securely adds 1 to the totalViewCount node in the database.
+// We only do this once per page load.
+update(totalViewsRef, increment(1));
+
+// 2. Display the current Total Views and listen for live updates
+onValue(totalViewsRef, (snapshot) => {
+    const count = snapshot.val() || 0; // Use .val() to get the number
+    document.getElementById("totalViewsCounter").textContent = count;
+});
+
+// ...Your existing live visitor counter code (onValue(connectedRef...))...
     </div>
 </div>
     </script>
