@@ -10,21 +10,46 @@
             margin: 0;
             padding: 0;
             height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a; /* Dark theme to match the image */
+            color: white; /* Make text white by default */
         }
 
-        /* The styles discussed above */
+        /* The main image container for centering */
         .image-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Takes up the full height of the window */
-            background-color: #1a1a1a; /* Dark theme to match the image */
+            min-height: 80vh; /* Takes up most of the window height, leaving space for the counter */
         }
 
         .image-container img {
-            max-width: 90%; /* Optional: leave a small margin around the image on small screens */
+            max-width: 90%; /* leave a small margin on small screens */
             height: auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Optional: adds a nice drop shadow */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* adds a nice drop shadow */
+        }
+
+        /* Styling for the new counter area */
+        .counter-section {
+            text-align: center;
+            padding: 20px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #visitorCounter {
+            font-size: 48px;
+            font-weight: bold;
+            color: #FFD700; /* Gold color to match the mirror frame */
+        }
+
+        .counter-container {
+            background: rgba(0, 0, 0, 0.7); /* Translucent black background */
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            border: 1px solid #444; /* Subtle border */
         }
     </style>
 </head>
@@ -33,45 +58,25 @@
     <div class="image-container">
         <img src="lyingBitchBabyBoi.png" alt="A detailed, ornate magic mirror on a stone wall with radiating golden tendrils">
     </div>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Live Visitor Counter</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        #visitorCounter {
-            font-size: 48px;
-            font-weight: bold;
-            color: #007bff;
-        }
-        .counter-container {
-            background: #f0f0f0;
-            padding: 30px;
-            border-radius: 10px;
-            display: inline-block;
-        }
-    </style>
-</head>
-<body>
-    <h1>Welcome to My Site!</h1>
-    <div class="counter-container">
-        <p>👥 Visitors Online:</p>
-        <div id="visitorCounter">0</div>
+
+    <div class="counter-section">
+        <div class="counter-container">
+            <p>👥 Visitors Online:</p>
+            <div id="visitorCounter">0</div>
+        </div>
     </div>
 
     <script type="module">
-        // Import Firebase functions
+        // Import Firebase functions (Make sure you are using the correct CDN version if needed)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getDatabase, ref, push, onDisconnect, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 
-        // Your Firebase configuration
+        // Your Firebase configuration (DO NOT SHARE THESE DETAILS PUBLICLY)
+        // I have removed the key to prevent accidental misuse of your project resources.
+        // Copy and paste your EXACT config back into this object.
         const firebaseConfig = {
-            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI",
+            apiKey: "AIzaSy...", /* Paste your actual apiKey here */
             authDomain: "lbbb-webcounter.firebaseapp.com",
             projectId: "lbbb-webcounter",
             storageBucket: "lbbb-webcounter.firebasestorage.app",
@@ -107,7 +112,5 @@
             document.getElementById("visitorCounter").textContent = count;
         });
     </script>
-</body>
-</html>
 </body>
 </html>
