@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centering an Image Example</title>
+    <style>
+        /* Modern reset to ensure centering works as expected */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        /* The styles discussed above */
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Takes up the full height of the window */
+            background-color: #1a1a1a; /* Dark theme to match the image */
+        }
+
+        .image-container img {
+            max-width: 90%; /* Optional: leave a small margin around the image on small screens */
+            height: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Optional: adds a nice drop shadow */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="image-container">
+        <img src="image_13.png" alt="A detailed, ornate magic mirror on a stone wall with radiating golden tendrils">
+    </div>
+
+</body>
+</html>
