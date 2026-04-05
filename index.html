@@ -20,7 +20,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 80vh; /* Takes up most of the window height, leaving space for the counter */
+            min-height: 75vh; /* Takes up most of the window height */
         }
 
         .image-container img {
@@ -29,19 +29,16 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* adds a nice drop shadow */
         }
 
-        /* Styling for the new counter area */
+        /* Base styling for both counter areas */
         .counter-section {
             text-align: center;
-            padding: 20px 0;
-            position: absolute;
-            bottom: 0;
             width: 100%;
-        }
-
-        #visitorCounter {
-            font-size: 48px;
-            font-weight: bold;
-            color: #FFD700; /* Gold color to match the mirror frame */
+            padding: 10px 0;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            gap: 20px; /* space between the two counters */
+            position: absolute;
+            bottom: 20px; /* Position them near the bottom */
         }
 
         .counter-container {
@@ -50,6 +47,20 @@
             border-radius: 10px;
             display: inline-block;
             border: 1px solid #444; /* Subtle border */
+        }
+
+        /* Styling for the numbers */
+        #visitorCounter, #totalViewsCounter {
+            font-weight: bold;
+            color: #FFD700; /* Gold color to match the mirror frame */
+        }
+
+        #visitorCounter {
+            font-size: 48px;
+        }
+
+        #totalViewsCounter {
+            font-size: 36px; /* Slightly smaller than the live counter */
         }
     </style>
 </head>
@@ -60,29 +71,34 @@
     </div>
 
     <div class="counter-section">
-        <div class="counter-container">
+        <div class="counter-container total-counter-container">
+            <p>✨ TALES DETECTED (Total):</p>
+            <div id="totalViewsCounter">0</div>
+        </div>
+
+        <div class="counter-container live-counter-container">
             <p>👥 Visitors Online:</p>
             <div id="visitorCounter">0</div>
         </div>
     </div>
 
     <script type="module">
-        // Import Firebase functions (Make sure you are using the correct CDN version if needed)
+        // Import Firebase functions (UPDATED: now imports 'update' and 'increment')
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getDatabase, ref, push, onDisconnect, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+        import { getDatabase, ref, push, onDisconnect, onValue, update, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 
         // Your Firebase configuration (DO NOT SHARE THESE DETAILS PUBLICLY)
-        // I have removed the key to prevent accidental misuse of your project resources.
-        // Copy and paste your EXACT config back into this object.
+        // Ensure you use your REAL, FULL apiKey here.
         const firebaseConfig = {
-            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI", /* Paste your actual apiKey here */
+            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI", /* Use your actual apiKey here */
             authDomain: "lbbb-webcounter.firebaseapp.com",
             projectId: "lbbb-webcounter",
             storageBucket: "lbbb-webcounter.firebasestorage.app",
             messagingSenderId: "217634980859",
             appId: "1:217634980859:web:49ef2b0aa7fe7d0bb1415e",
             measurementId: "G-K6L33E59SJ",
+            // This is the property that must match your Firebase Console EXACTLY:
             databaseURL: "https://lbbb-webcounter-default-rtdb.firebaseio.com/"
         };
 
@@ -91,7 +107,19 @@
         const analytics = getAnalytics(app);
         const db = getDatabase(app);
 
-        // References
+        // --- SECTION 1: TOTAL VIEWS COUNTER (Cumulative) ---
+        const totalViewsRef = ref(db, "totalViewCount");
+
+        // 1. Increment Total Views securely on page load
+        update(totalViewsRef, increment(1));
+
+        // 2. Display the current Total Views and listen for live updates
+        onValue(totalViewsRef, (snapshot) => {
+            const count = snapshot.val() || 0; // Use .val() to get the number
+            document.getElementById("totalViewsCounter").textContent = count;
+        });
+
+        // --- SECTION 2: LIVE VISITOR COUNTER (Connections) ---
         const visitorsConnectedRef = ref(db, "visitorsConnected");
         const connectedRef = ref(db, ".info/connected");
 
@@ -111,34 +139,6 @@
             const count = snapshot.size || 0; // Use .size for number of children
             document.getElementById("visitorCounter").textContent = count;
         });
-
-        <div class="counter-section total-counter-section">
-    <div class="counter-container">
-        <p>✨ TALES DETECTED (Total):</p>
-        <div id="totalViewsCounter">0</div>
-            // ...other imports...
-// Make sure you import 'update' and 'increment'
-import { getDatabase, ref, push, onDisconnect, onValue, update, increment } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
-
-// ...Firebase config and initialization...
-
-// New references
-const totalViewsRef = ref(db, "totalViewCount");
-
-// 1. Increment Total Views on page load
-// This securely adds 1 to the totalViewCount node in the database.
-// We only do this once per page load.
-update(totalViewsRef, increment(1));
-
-// 2. Display the current Total Views and listen for live updates
-onValue(totalViewsRef, (snapshot) => {
-    const count = snapshot.val() || 0; // Use .val() to get the number
-    document.getElementById("totalViewsCounter").textContent = count;
-});
-
-// ...Your existing live visitor counter code (onValue(connectedRef...))...
-    </div>
-</div>
     </script>
 </body>
 </html>
