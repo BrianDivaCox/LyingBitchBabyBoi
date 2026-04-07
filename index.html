@@ -3,65 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lying Bitch Baby Boi v3.0 </title>
+    <title id="pageTitle">Lying Bitch Baby Boi v3.0</title>
     <style>
         /* Reset and Base Styles */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a; /* Dark theme to match the image */
-            color: white; /* Make text white by default */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a; 
+            color: white; 
+            overflow-x: hidden;
         }
 
         /* The main image container */
         .image-container {
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            min-height: 70vh; /* Adjust height to provide space for counters below */
+            justify-content: center; 
+            align-items: center; 
+            min-height: 70vh; 
             padding-top: 20px;
         }
 
         .image-container img {
-            max-width: 90%; /* leave small margin on small screens */
+            max-width: 90%; 
             height: auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* adds a drop shadow */
+            box-shadow: 0 4px 25px rgba(0,0,0,0.7); 
+            border-radius: 8px;
         }
 
-        /* Base styling for both counter areas (flex for centering and spacing) */
+        /* Counter Section Styling */
         .counter-section {
             text-align: center;
             width: 100%;
-            padding: 20px 0 40px 0; /* Space above and below the counters */
+            padding: 20px 0 60px 0; 
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            gap: 20px; /* space between the two counters */
-            position: relative; /* Removes from previous absolute positioning flow */
+            justify-content: center; 
+            align-items: center; 
+            gap: 25px; 
+            flex-wrap: wrap;
         }
 
         .counter-container {
-            background: rgba(0, 0, 0, 0.7); /* Translucent black background */
+            background: rgba(20, 20, 20, 0.85); 
             padding: 15px 30px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: inline-block;
-            border: 1px solid #444; /* Subtle border */
+            border: 1px solid #444; 
+            min-width: 180px;
         }
 
-        /* Styling for the numbers */
+        .counter-container p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #bbb;
+        }
+
         #visitorCounter, #totalViewsCounter {
             font-weight: bold;
-            color: #FFD700; /* Gold color to match the mirror frame */
+            color: #FFD700; 
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
-        #visitorCounter {
-            font-size: 48px;
-        }
+        #visitorCounter { font-size: 48px; }
+        #totalViewsCounter { font-size: 36px; }
 
-        #totalViewsCounter {
-            font-size: 36px; /* Slightly smaller than the live counter */
+        /* Version Tag */
+        .version-tag {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 12px;
+            color: #555;
+            font-family: monospace;
         }
     </style>
 </head>
@@ -73,27 +89,32 @@
 
     <div class="counter-section">
         <div class="counter-container total-counter-container">
-            <p>✨ TALES DETECTED (Total):</p>
+            <p>✨ TALES DETECTED</p>
             <div id="totalViewsCounter">0</div>
         </div>
 
         <div class="counter-container live-counter-container">
-            <p>👥 Visitors Online:</p>
+            <p>👥 VISITORS ONLINE</p>
             <div id="visitorCounter">0</div>
         </div>
     </div>
 
+    <div id="uiVersion" class="version-tag"></div>
+
     <script type="module">
+        // Set Version here once to update everywhere
+        const APP_VERSION = "3.0";
+        document.getElementById("pageTitle").innerText = `Lying Bitch Baby Boi v${APP_VERSION}`;
+        document.getElementById("uiVersion").innerText = `v${APP_VERSION}-stable`;
+
         // Import essential Firebase functions
-        // We use 'runTransaction' for the total to ensure accuracy.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getDatabase, ref, push, onDisconnect, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+        import { getDatabase, ref, push, set, onDisconnect, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 
-        // Your Firebase configuration (DO NOT SHARE THESE DETAILS PUBLICLY)
-        // Copy and paste your ACTUAL config back into this object.
+        // Your Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI", /* Paste your actual apiKey here */
+            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI",
             authDomain: "lbbb-webcounter.firebaseapp.com",
             projectId: "lbbb-webcounter",
             storageBucket: "lbbb-webcounter.firebasestorage.app",
@@ -108,47 +129,34 @@
         const analytics = getAnalytics(app);
         const db = getDatabase(app);
 
-        // --- SECTION 1: TOTAL VIEWS COUNTER (Cumulative) ---
+        // --- SECTION 1: TOTAL VIEWS COUNTER ---
         const totalViewsRef = ref(db, "totalViewCount");
 
-        // 1. Increment Total Views securely using a TRANSACTION on page load.
-        // It checks the CURRENT value and only adds 1 to it.
         runTransaction(totalViewsRef, (currentValue) => {
-            // If 'currentValue' doesn't exist yet, start at 1.
             if (currentValue === null || typeof currentValue === 'undefined') {
                 return 1;
             }
-            
-            // Otherwise, add 1 to the existing value.
-            const currentCount = Number(currentValue) || 0;
-            return currentCount + 1;
+            return (Number(currentValue) || 0) + 1;
         });
 
-        // 2. Display the current Total Views and listen for live updates
         onValue(totalViewsRef, (snapshot) => {
-            const count = snapshot.val() || 0; // Use .val() to get the number
-            document.getElementById("totalViewsCounter").textContent = count;
+            document.getElementById("totalViewsCounter").textContent = snapshot.val() || 0;
         });
 
-        // --- SECTION 2: LIVE VISITOR COUNTER (Connections) ---
+        // --- SECTION 2: LIVE VISITOR COUNTER ---
         const visitorsConnectedRef = ref(db, "visitorsConnected");
         const connectedRef = ref(db, ".info/connected");
 
-        // Monitor connection status
         onValue(connectedRef, (snapshot) => {
             if (snapshot.val() === true) {
-                // We're connected, add this visitor
-                const visitorRef = push(visitorsConnectedRef, true);
-
-                // Remove this visitor when they disconnect
+                const visitorRef = push(visitorsConnectedRef);
+                set(visitorRef, true);
                 onDisconnect(visitorRef).remove();
             }
         });
 
-        // Listen for live updates to visitor count
         onValue(visitorsConnectedRef, (snapshot) => {
-            const count = snapshot.size || 0; // Use .size for number of children
-            document.getElementById("visitorCounter").textContent = count;
+            document.getElementById("visitorCounter").textContent = snapshot.size || 0;
         });
     </script>
 </body>
