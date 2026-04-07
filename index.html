@@ -3,97 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Lying Bitch Baby Boi v3.0</title>
+    <title id="pageTitle">Lying Bitch Baby Boi </title>
     <style>
-        /* Reset and Base Styles */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a; 
-            color: white; 
-            overflow-x: hidden;
-        }
-
-        /* The main image container */
-        .image-container {
-            display: flex;
-            justify-content: center; 
-            align-items: center; 
-            min-height: 70vh; 
-            padding-top: 20px;
-        }
-
-        .image-container img {
-            max-width: 90%; 
-            height: auto;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.7); 
-            border-radius: 8px;
-        }
-
-        /* Counter Section Styling */
-        .counter-section {
-            text-align: center;
-            width: 100%;
-            padding: 20px 0 60px 0; 
-            display: flex;
-            justify-content: center; 
-            align-items: center; 
-            gap: 25px; 
-            flex-wrap: wrap;
-        }
-
-        .counter-container {
-            background: rgba(20, 20, 20, 0.85); 
-            padding: 15px 30px;
-            border-radius: 12px;
-            display: inline-block;
-            border: 1px solid #444; 
-            min-width: 180px;
-        }
-
-        .counter-container p {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #bbb;
-        }
-
-        #visitorCounter, #totalViewsCounter {
-            font-weight: bold;
-            color: #FFD700; 
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #1a1a1a; color: white; overflow-x: hidden; }
+        .image-container { display: flex; justify-content: center; align-items: center; min-height: 70vh; padding-top: 20px; }
+        .image-container img { max-width: 90%; height: auto; box-shadow: 0 4px 25px rgba(0,0,0,0.7); border-radius: 8px; }
+        .counter-section { text-align: center; width: 100%; padding: 20px 0 60px 0; display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap; }
+        .counter-container { background: rgba(20, 20, 20, 0.85); padding: 15px 30px; border-radius: 12px; display: inline-block; border: 1px solid #444; min-width: 180px; }
+        .counter-container p { margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; color: #bbb; }
+        #visitorCounter, #totalViewsCounter { font-weight: bold; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
         #visitorCounter { font-size: 48px; }
         #totalViewsCounter { font-size: 36px; }
-
-        /* Version Tag */
-        .version-tag {
-            position: fixed;
-            bottom: 10px;
-            right: 15px;
-            font-size: 12px;
-            color: #555;
-            font-family: monospace;
-        }
+        .version-tag { position: fixed; bottom: 10px; right: 15px; font-size: 12px; color: #555; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <div class="image-container">
-        <img src="lyingBitchBabyBoi.png" alt="A detailed, ornate magic mirror on a stone wall with radiating golden tendrils">
+        <img src="lyingBitchBabyBoi.png" alt="Magic Mirror">
     </div>
 
     <div class="counter-section">
-        <div class="counter-container total-counter-container">
+        <div class="counter-container">
             <p>✨ TALES DETECTED</p>
             <div id="totalViewsCounter">0</div>
         </div>
-
-        <div class="counter-container live-counter-container">
+        <div class="counter-container">
             <p>👥 VISITORS ONLINE</p>
             <div id="visitorCounter">0</div>
         </div>
@@ -102,62 +37,42 @@
     <div id="uiVersion" class="version-tag"></div>
 
     <script type="module">
-        // Set Version here once to update everywhere
         const APP_VERSION = "3.0";
         document.getElementById("pageTitle").innerText = `Lying Bitch Baby Boi v${APP_VERSION}`;
         document.getElementById("uiVersion").innerText = `v${APP_VERSION}-stable`;
 
-        // Import essential Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getDatabase, ref, push, set, onDisconnect, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 
-        // Your Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCokXnEtboNuUIASBMz2ZzS0GuchemoJYI",
+            apiKey: "AIzaSyC_hi0FHW0wBzctoEs551NfQxU3MbQNC3w",
             authDomain: "lbbb-webcounter.firebaseapp.com",
             projectId: "lbbb-webcounter",
             storageBucket: "lbbb-webcounter.firebasestorage.app",
             messagingSenderId: "217634980859",
             appId: "1:217634980859:web:49ef2b0aa7fe7d0bb1415e",
-            measurementId: "G-K6L33E59SJ",
             databaseURL: "https://lbbb-webcounter-default-rtdb.firebaseio.com/"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getDatabase(app);
 
-        // --- SECTION 1: TOTAL VIEWS COUNTER ---
+        // Total Views Logic
         const totalViewsRef = ref(db, "totalViewCount");
+        runTransaction(totalViewsRef, (current) => (current === null ? 1 : Number(current) + 1));
+        onValue(totalViewsRef, (snap) => { document.getElementById("totalViewsCounter").textContent = snap.val() || 0; });
 
-        runTransaction(totalViewsRef, (currentValue) => {
-            if (currentValue === null || typeof currentValue === 'undefined') {
-                return 1;
-            }
-            return (Number(currentValue) || 0) + 1;
-        });
-
-        onValue(totalViewsRef, (snapshot) => {
-            document.getElementById("totalViewsCounter").textContent = snapshot.val() || 0;
-        });
-
-        // --- SECTION 2: LIVE VISITOR COUNTER ---
-        const visitorsConnectedRef = ref(db, "visitorsConnected");
+        // Live Visitors Logic
+        const visitorsRef = ref(db, "visitorsConnected");
         const connectedRef = ref(db, ".info/connected");
-
-        onValue(connectedRef, (snapshot) => {
-            if (snapshot.val() === true) {
-                const visitorRef = push(visitorsConnectedRef);
-                set(visitorRef, true);
-                onDisconnect(visitorRef).remove();
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const vRef = push(visitorsRef);
+                set(vRef, true);
+                onDisconnect(vRef).remove();
             }
         });
-
-        onValue(visitorsConnectedRef, (snapshot) => {
-            document.getElementById("visitorCounter").textContent = snapshot.size || 0;
-        });
+        onValue(visitorsRef, (snap) => { document.getElementById("visitorCounter").textContent = snap.size || 0; });
     </script>
 </body>
 </html>
