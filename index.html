@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">LBBB </title>
+    <title id="pageTitle">Lying Bitch Baby Boi</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background-color: #1a1a1a; color: white; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; overflow-x: hidden; }
         .image-container { display: flex; justify-content: center; align-items: center; min-height: 70vh; padding-top: 20px; }
         .image-container img { max-width: 90%; height: auto; box-shadow: 0 4px 25px rgba(0,0,0,0.7); border-radius: 8px; }
         .counter-section { text-align: center; width: 100%; padding: 20px 0 60px 0; display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap; }
@@ -14,13 +14,15 @@
         #visitorCounter, #totalViewsCounter { font-weight: bold; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
         #visitorCounter { font-size: 48px; }
         #totalViewsCounter { font-size: 36px; }
+        
+        /* Version Tag Style */
         .version-tag { position: fixed; bottom: 10px; right: 15px; font-size: 12px; color: #555; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <div class="image-container">
-        <img src="lyingBitchBabyBoi.png" alt="Magic Mirror">
+        <img src="lyingBitchBabyBoi.png" alt="Ornate Magic Mirror">
     </div>
 
     <div class="counter-section">
@@ -37,13 +39,20 @@
     <div id="uiVersion" class="version-tag"></div>
 
     <script type="module">
-        const APP_VERSION = "3.0";
+        // --- VERSION CONTROL ---
+        // Change this one number to update the Tab Title and the Footer!
+        const APP_VERSION = "3.0"; 
+        
+        // Update Title Bar
         document.getElementById("pageTitle").innerText = `Lying Bitch Baby Boi v${APP_VERSION}`;
+        // Update Site Footer
         document.getElementById("uiVersion").innerText = `v${APP_VERSION}-stable`;
 
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getDatabase, ref, push, set, onDisconnect, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
+        // Firebase Config with your NEW key
         const firebaseConfig = {
             apiKey: "AIzaSyC_hi0FHW0wBzctoEs551NfQxU3MbQNC3w",
             authDomain: "lbbb-webcounter.firebaseapp.com",
@@ -57,12 +66,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Total Views Logic
+        // --- TOTAL VIEWS (Increments by 1) ---
         const totalViewsRef = ref(db, "totalViewCount");
         runTransaction(totalViewsRef, (current) => (current === null ? 1 : Number(current) + 1));
         onValue(totalViewsRef, (snap) => { document.getElementById("totalViewsCounter").textContent = snap.val() || 0; });
 
-        // Live Visitors Logic
+        // --- LIVE VISITORS (Secure Path) ---
         const visitorsRef = ref(db, "visitorsConnected");
         const connectedRef = ref(db, ".info/connected");
         onValue(connectedRef, (snap) => {
